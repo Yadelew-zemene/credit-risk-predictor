@@ -102,20 +102,47 @@ def analyze_categorical_features(df):
             summary = summary.sort_values("default_rate",ascending=False,)
 
             print(summary)
+def analyze_missing_data(df):
+    """Analyze missing values and identify features requiring attention."""
+
+    print("EDA-06: MISSING DATA")
+    missing = pd.DataFrame({ "missing_count": df.isna().sum(),"missing_pct": df.isna().mean() * 100,})
+    missing = ( missing[missing["missing_count"] > 0].sort_values("missing_pct", ascending=False))
+
+    print("\nFeatures with missing values: \n", missing.to_string())
+
+    print("\nMissing-data summary:")
+    print(f"Features with missing values: {len(missing)}")
+
+    print(f"Features with >50% missing: "f"{(missing['missing_pct'] > 50).sum()}")
+    print( f"Features with >30% missing: "f"{(missing['missing_pct'] > 30).sum()}")
+def analayze_num_features_rel_to_target(df:pd.DataFrame)->None:
+    """ Analyze the numerical relationship with target"""
+    print("EDA-07: NUMERICAL FEATURE RELATIONSHIP WITH TARGET")
+    # Select numerical features only
+    numeric_features = df.select_dtypes(include=["int64", "float64"]).columns
+    # Calculate correlation with TARGET
+    target_correlation = ( df[numeric_features].corr()["TARGET"].drop("TARGET").sort_values())
+
+    print("\nStrongest negative correlations: \n", target_correlation.head(10))
+    print("\nStrongest positive correlations: \n ",target_correlation.tail(10))
+
+
 # Main
 def main() -> None:
+
     df = load_data()
 
     print(f"Loaded: {DATA_PATH}")
     print(f"Shape: {df.shape}")
 
     analyze_target(df)
-    analyze_numerical_distributions(df)
-
+    # analyze_numerical_distributions(df)
     investigate_days_employed(df)
-    analyze_target_vs_numerical(df)
+    # analyze_target_vs_numerical(df)
     analyze_categorical_features(df)
-
+    analyze_missing_data(df)
+    analayze_num_features_rel_to_target(df)
 
 if __name__ == "__main__":
     main()
