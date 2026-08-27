@@ -57,7 +57,31 @@ def investigate_days_employed(df: pd.DataFrame) -> None:
 
     print("\nMaximum DAYS_EMPLOYED:",df["DAYS_EMPLOYED"].max())
     print("\nNumber of rows with DAYS_EMPLOYED = 365243:", (df["DAYS_EMPLOYED"] == 365243).sum())
+def analyze_target_vs_numerical(df: pd.DataFrame) -> None:
+    """Compare important numerical features across target classes."""
+    print("EDA-04: TARGET VS NUMERICAL FEATURES")
 
+    print("\nMedian values by TARGET: \n", df.groupby("TARGET")[NUMERICAL_FEATURES].median().T)
+    print("\nMean values by TARGET: \n",df.groupby("TARGET")[NUMERICAL_FEATURES].mean().T)
+
+    age_years = -df["DAYS_BIRTH"] / 365.25
+    age_bins = [18, 25, 30, 35, 40, 50, 60, 100]
+    age_groups = pd.cut(age_years,bins=age_bins,right=False)
+
+    default_rate_by_age = (df.groupby(age_groups, observed=False)["TARGET"].mean().mul(100).round(2))
+    print("\nDefault rate by age group (%): \n", default_rate_by_age)
+
+    for feature in NUMERICAL_FEATURES:
+        plt.figure(figsize=(8, 5))
+        df.boxplot( column=feature,by="TARGET")
+
+        plt.title(f"{feature} by TARGET")
+        plt.suptitle("")
+        plt.xlabel("TARGET")
+        plt.ylabel(feature)
+
+        plt.tight_layout()
+        plt.show()
 # Main
 def main() -> None:
     df = load_data()
@@ -66,9 +90,10 @@ def main() -> None:
     print(f"Shape: {df.shape}")
 
     analyze_target(df)
-    analyze_numerical_distributions(df)
+    # analyze_numerical_distributions(df)
 
     investigate_days_employed(df)
+    analyze_target_vs_numerical(df)
 
 
 if __name__ == "__main__":
