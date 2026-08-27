@@ -82,6 +82,26 @@ def analyze_target_vs_numerical(df: pd.DataFrame) -> None:
 
         plt.tight_layout()
         plt.show()
+
+def analyze_categorical_features(df):
+        """Analyze categorical features against the target."""
+
+        categorical_features = [
+            "NAME_INCOME_TYPE",
+            "NAME_EDUCATION_TYPE",
+            "NAME_FAMILY_STATUS",
+            "NAME_HOUSING_TYPE",
+            "OCCUPATION_TYPE",
+        ]
+
+        print("EDA-05: CATEGORICAL FEATURES")
+        for feature in categorical_features:
+            print(f"\n{feature}")
+            summary = (df.groupby(feature, dropna=False)["TARGET"].agg( count="count", default_rate="mean",))
+            summary["default_rate"] = (summary["default_rate"] * 100 ).round(2)
+            summary = summary.sort_values("default_rate",ascending=False,)
+
+            print(summary)
 # Main
 def main() -> None:
     df = load_data()
@@ -90,10 +110,11 @@ def main() -> None:
     print(f"Shape: {df.shape}")
 
     analyze_target(df)
-    # analyze_numerical_distributions(df)
+    analyze_numerical_distributions(df)
 
     investigate_days_employed(df)
     analyze_target_vs_numerical(df)
+    analyze_categorical_features(df)
 
 
 if __name__ == "__main__":
