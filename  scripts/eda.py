@@ -137,9 +137,9 @@ def main() -> None:
     print(f"Shape: {df.shape}")
 
     analyze_target(df)
-    # analyze_numerical_distributions(df)
+    analyze_numerical_distributions(df)
     investigate_days_employed(df)
-    # analyze_target_vs_numerical(df)
+    analyze_target_vs_numerical(df)
     analyze_categorical_features(df)
     analyze_missing_data(df)
     analayze_num_features_rel_to_target(df)
