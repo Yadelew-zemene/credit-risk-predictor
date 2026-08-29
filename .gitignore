@@ -1,23 +1,23 @@
-# Virtual environment
-.venv/
-
-# PyCharm
-.idea/
-
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
 
-# Jupyter
-.ipynb_checkpoints/
+# Virtual environment
+.venv/
+venv/
 
 # Data
 data/raw/
 data/processed/
 
-# Environment variables
-.env
+# Models
+models/*.pkl
+models/*.joblib
+models/*.onnx
+
+# IDE
+.idea/
+.vscode/
 
 # OS
 .DS_Store
