@@ -11,6 +11,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = (PROJECT_ROOT / "data" / "raw"  / "home-credit-default-risk" / "application_train.csv")
 OUTPUT_DIR = PROJECT_ROOT / "data" / "processed"
 
+def split_data( df: pd.DataFrame,) -> tuple[ pd.DataFrame,pd.DataFrame,pd.Series,pd.Series,]:
+    """Create a reproducible stratified train/validation split."""
+
+    X = df.drop(columns=["TARGET"])
+    y = df["TARGET"]
+
+    X_train, X_valid, y_train, y_valid = train_test_split(X,y,test_size=0.2,random_state=42,stratify=y,)
+
+    return X_train, X_valid, y_train, y_valid
 
 def main():
     print("Loading dataset...")
@@ -18,9 +27,9 @@ def main():
     df = pd.read_csv(DATA_PATH)
     print(f"Dataset shape: {df.shape}")
 
-    X,y = df.drop(columns=["TARGET"]), df["TARGET"]
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y,test_size=0.20,stratify=y,random_state=RANDOM_STATE,
-                                                          )
+
+    X_train, X_valid, y_train, y_valid =  split_data(df)
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     X_train.to_csv(OUTPUT_DIR / "X_train.csv", index=False)

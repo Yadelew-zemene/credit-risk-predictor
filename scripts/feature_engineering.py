@@ -34,7 +34,19 @@ def create_age_feature(df: pd.DataFrame) -> pd.DataFrame:
     df["AGE_YEARS"] = -df["DAYS_BIRTH"] / 365.25
 
     return df
+def create_employment_feature(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create EMPLOYMENT_YEARS from DAYS_EMPLOYED.
 
+    The value 365243 is an anomalous encoded value and is treated
+    as missing before conversion to years.
+    """
+
+    df = df.copy()
+    employment_days = df["DAYS_EMPLOYED"].replace(365243, pd.NA)
+    df["EMPLOYMENT_YEARS"] = -employment_days / 365.25
+
+    return df
 
 
 # Main
@@ -45,12 +57,19 @@ def main() -> None:
 
     # Create the feature
     df = create_age_feature(df)
+    df = create_employment_feature(df)
 
     print("\nFE-01: AGE_YEARS \n ----------------")
     print(df["AGE_YEARS"].describe())
 
 
     print(f" First 10 values{df[["DAYS_BIRTH", "AGE_YEARS"]].head(10)}")
+    print("\nFE-02: EMPLOYMENT_YEARS \n ----------------------")
+
+    print(df["EMPLOYMENT_YEARS"].describe())
+
+    print(f"\nAnomalous employment values: {df["DAYS_EMPLOYED"].eq(365243).sum()}")
+    print(f"\nFirst 10 values:  \n {df[["DAYS_EMPLOYED", "EMPLOYMENT_YEARS"]].head(10)}")
 
 
 if __name__ == "__main__":
