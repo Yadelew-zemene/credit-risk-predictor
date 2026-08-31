@@ -62,6 +62,8 @@ def create_annuity_income_ratio(df: pd.DataFrame) -> pd.DataFrame:
     df["ANNUITY_INCOME_RATIO"] = (df["AMT_ANNUITY"] / df["AMT_INCOME_TOTAL"])
 
     return df
+
+
 def create_credit_annuity_ratio(df: pd.DataFrame) -> pd.DataFrame:
     """Create the ratio between credit amount and loan annuity."""
 
@@ -70,41 +72,56 @@ def create_credit_annuity_ratio(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-# Main
+def create_employment_anomaly_flag(df: pd.DataFrame) -> pd.DataFrame:
+    """Flag the anomalous DAYS_EMPLOYED value."""
 
+    df = df.copy()
+    df["EMPLOYED_ANOMALY"] = (df["DAYS_EMPLOYED"] == 365243).astype(int)
+
+    return df
+
+# Main
 def main() -> None:
 
     df = load_data(DATA_PATH)
 
     # Create the feature
     df = create_age_feature(df)
-    df = create_employment_feature(df)
-    df = create_credit_income_ratio(df)
-    df = create_annuity_income_ratio(df)
-    df =  create_credit_annuity_ratio(df)
-
 
     print("\nFE-01: AGE_YEARS \n ----------------")
     print(df["AGE_YEARS"].describe())
     print(f" First 10 values{df[["DAYS_BIRTH", "AGE_YEARS"]].head(10)}")
+
+    df = create_employment_feature(df)
 
     print("\nFE-02: EMPLOYMENT_YEARS \n ----------------------")
     print(df["EMPLOYMENT_YEARS"].describe())
     print(f"\nAnomalous employment values: {df["DAYS_EMPLOYED"].eq(365243).sum()}")
     print(f"\nFirst 10 values:  \n {df[["DAYS_EMPLOYED", "EMPLOYMENT_YEARS"]].head(10)}")
 
+    df = create_credit_income_ratio(df)
+
     print("\nFE-03: CREDIT_INCOME_RATIO \n--------------------------")
     print(df["CREDIT_INCOME_RATIO"].describe())
     print( df[["AMT_INCOME_TOTAL","AMT_CREDIT","CREDIT_INCOME_RATIO", ] ].head(10) )
 
+    df = create_annuity_income_ratio(df)
 
     print("\nFE-04: ANNUITY_INCOME_RATIO \n ---------------------------")
     print(df["ANNUITY_INCOME_RATIO"].describe())
     print(df[["AMT_INCOME_TOTAL","AMT_ANNUITY","ANNUITY_INCOME_RATIO"]].head(10))
 
+    df = create_credit_annuity_ratio(df)
+
     print("\nFE-05: CREDIT_ANNUITY_RATIO \n ---------------------------")
     print(df["CREDIT_ANNUITY_RATIO"].describe())
     print(df[["AMT_CREDIT", "AMT_ANNUITY","CREDIT_ANNUITY_RATIO"]].head(10))
+
+    df = create_employment_anomaly_flag(df)
+
+    print("\nFE-06: EMPLOYED_ANOMALY \n  ---------------------")
+    print(df["EMPLOYED_ANOMALY"].value_counts())
+    print(f"Default rate by employment anomaly:{df.groupby("EMPLOYED_ANOMALY")["TARGET"].mean().mul(100).round(2)}")
 
 if __name__ == "__main__":
     main()
