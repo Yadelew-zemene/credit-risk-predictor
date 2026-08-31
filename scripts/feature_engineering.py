@@ -97,60 +97,65 @@ def create_income_per_family_member(df: pd.DataFrame) -> pd.DataFrame:
     df["INCOME_PER_FAMILY_MEMBER"] = ( df["AMT_INCOME_TOTAL"]/ df["CNT_FAM_MEMBERS"])
 
     return df
+def create_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply all deterministic feature engineering transformations."""
 
+    df = create_age_feature(df)
+    df = create_employment_feature(df)
+    df = create_credit_income_ratio(df)
+    df = create_annuity_income_ratio(df)
+    df = create_credit_annuity_ratio(df)
+    df = create_employment_anomaly_flag(df)
+    df = create_ext_source_mean(df)
+    df = create_income_per_family_member(df)
+
+    return df
 # Main
 def main() -> None:
 
     df = load_data(DATA_PATH)
 
     # Create the feature
-    df = create_age_feature(df)
+    df = create_features(df)
 
     print("\nFE-01: AGE_YEARS \n ----------------")
     print(df["AGE_YEARS"].describe())
     print(f" First 10 values{df[["DAYS_BIRTH", "AGE_YEARS"]].head(10)}")
-
-    df = create_employment_feature(df)
 
     print("\nFE-02: EMPLOYMENT_YEARS \n ----------------------")
     print(df["EMPLOYMENT_YEARS"].describe())
     print(f"\nAnomalous employment values: {df["DAYS_EMPLOYED"].eq(365243).sum()}")
     print(f"\nFirst 10 values:  \n {df[["DAYS_EMPLOYED", "EMPLOYMENT_YEARS"]].head(10)}")
 
-    df = create_credit_income_ratio(df)
+
 
     print("\nFE-03: CREDIT_INCOME_RATIO \n--------------------------")
     print(df["CREDIT_INCOME_RATIO"].describe())
     print( df[["AMT_INCOME_TOTAL","AMT_CREDIT","CREDIT_INCOME_RATIO", ] ].head(10) )
 
-    df = create_annuity_income_ratio(df)
+
 
     print("\nFE-04: ANNUITY_INCOME_RATIO \n ---------------------------")
     print(df["ANNUITY_INCOME_RATIO"].describe())
     print(df[["AMT_INCOME_TOTAL","AMT_ANNUITY","ANNUITY_INCOME_RATIO"]].head(10))
 
-    df = create_credit_annuity_ratio(df)
+
 
     print("\nFE-05: CREDIT_ANNUITY_RATIO \n ---------------------------")
     print(df["CREDIT_ANNUITY_RATIO"].describe())
     print(df[["AMT_CREDIT", "AMT_ANNUITY","CREDIT_ANNUITY_RATIO"]].head(10))
 
-    df = create_employment_anomaly_flag(df)
+
 
     print("\nFE-06: EMPLOYED_ANOMALY \n  ---------------------")
     print(df["EMPLOYED_ANOMALY"].value_counts())
     print(f"Default rate by employment anomaly:{df.groupby("EMPLOYED_ANOMALY")["TARGET"].mean().mul(100).round(2)}")
 
-    df = create_ext_source_mean(df)
+
 
     print("\nFE-07: EXT_SOURCE_MEAN \n------------------------")
     print(df["EXT_SOURCE_MEAN"].describe())
 
-    print(f"\nMissing values: {df["EXT_SOURCE_MEAN"].isna().sum()}")
-    print(df[["EXT_SOURCE_1","EXT_SOURCE_2","EXT_SOURCE_3","EXT_SOURCE_MEAN",] ].head(10))
-
-
-    df = create_income_per_family_member(df)
 
     print("\nFE-08: INCOME_PER_FAMILY_MEMBER\n --------------------------------  ")
     print(df["INCOME_PER_FAMILY_MEMBER"].describe())
