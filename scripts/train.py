@@ -158,6 +158,28 @@ def evaluate_model(model,X_valid_processed, y_valid,):
         "precision": precision,
         "recall": recall,
         "f1": f1,}
+def evaluate_thresholds(y_valid, y_prob):
+    """Evaluate classification performance at different probability thresholds."""
+
+    thresholds = [0.20, 0.30, 0.40, 0.50, 0.60, 0.70]
+
+    print("\nThreshold Analysis : \n ------------------")
+
+    print("Threshold | Precision | Recall | F1")
+
+    for threshold in thresholds:
+        y_pred = (y_prob >= threshold).astype(int)
+
+        precision = precision_score(y_valid, y_pred, zero_division=0)
+        recall = recall_score(y_valid, y_pred, zero_division=0)
+        f1 = f1_score(y_valid, y_pred, zero_division=0)
+
+        print(
+            f"{threshold:9.2f} | "
+            f"{precision:9.4f} | "
+            f"{recall:6.4f} | "
+            f"{f1:6.4f}"
+        )
 
 def main() -> None:
 
@@ -184,6 +206,8 @@ def main() -> None:
     model = train_model(model,X_train_processed,y_train,)
     metrics = evaluate_model(model,X_valid_processed,y_valid,)
 
+    y_prob = model.predict_proba(X_valid_processed)[:, 1]
+    evaluate_thresholds(y_valid, y_prob)
 
 if __name__ == "__main__":
     main()
