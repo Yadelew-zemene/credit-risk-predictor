@@ -80,6 +80,16 @@ def create_employment_anomaly_flag(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+def create_ext_source_mean(df: pd.DataFrame) -> pd.DataFrame:
+    """Create the mean of available external credit scores."""
+
+    df = df.copy()
+    ext_source_columns = [ "EXT_SOURCE_1","EXT_SOURCE_2","EXT_SOURCE_3",]
+    df["EXT_SOURCE_MEAN"] = df[ext_source_columns].mean(axis=1)
+
+
+    return df
+
 # Main
 def main() -> None:
 
@@ -122,6 +132,14 @@ def main() -> None:
     print("\nFE-06: EMPLOYED_ANOMALY \n  ---------------------")
     print(df["EMPLOYED_ANOMALY"].value_counts())
     print(f"Default rate by employment anomaly:{df.groupby("EMPLOYED_ANOMALY")["TARGET"].mean().mul(100).round(2)}")
+
+    df = create_ext_source_mean(df)
+
+    print("\nFE-07: EXT_SOURCE_MEAN \n------------------------")
+    print(df["EXT_SOURCE_MEAN"].describe())
+
+    print(f"\nMissing values: {df["EXT_SOURCE_MEAN"].isna().sum()}")
+    print(df[["EXT_SOURCE_1","EXT_SOURCE_2","EXT_SOURCE_3","EXT_SOURCE_MEAN",] ].head(10))
 
 if __name__ == "__main__":
     main()
