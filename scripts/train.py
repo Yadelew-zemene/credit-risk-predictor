@@ -12,7 +12,6 @@ Responsibilities:
 """
 
 from pathlib import Path
-
 import pandas as pd
 from fontTools.misc.cython import returns
 from sklearn.linear_model import LogisticRegression

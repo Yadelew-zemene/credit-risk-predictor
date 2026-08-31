@@ -21,7 +21,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TRAIN_PATH = (PROJECT_ROOT/ "data"/ "raw" / "home-credit-default-risk"/ "application_train.csv")
 DESCRIPTION_PATH = (PROJECT_ROOT/ "data"/ "raw"/ "HomeCredit_columns_description.csv")
 
+def load_data(path:Path)->pd.DataFrame:
+    df= pd.read_csv(TRAIN_PATH)
 
+    return  df
 
 # Load data
 print("HOME CREDIT DEFAULT RISK — DATA UNDERSTANDING")

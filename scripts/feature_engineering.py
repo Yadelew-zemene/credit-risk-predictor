@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from data_split import split_data
-from preprocessing import  load_data
+from data_understanding import  load_data
 
 
 
