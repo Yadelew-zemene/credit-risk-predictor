@@ -90,6 +90,14 @@ def create_ext_source_mean(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+def create_income_per_family_member(df: pd.DataFrame) -> pd.DataFrame:
+    """Create income relative to family size."""
+
+    df = df.copy()
+    df["INCOME_PER_FAMILY_MEMBER"] = ( df["AMT_INCOME_TOTAL"]/ df["CNT_FAM_MEMBERS"])
+
+    return df
+
 # Main
 def main() -> None:
 
@@ -140,6 +148,15 @@ def main() -> None:
 
     print(f"\nMissing values: {df["EXT_SOURCE_MEAN"].isna().sum()}")
     print(df[["EXT_SOURCE_1","EXT_SOURCE_2","EXT_SOURCE_3","EXT_SOURCE_MEAN",] ].head(10))
+
+
+    df = create_income_per_family_member(df)
+
+    print("\nFE-08: INCOME_PER_FAMILY_MEMBER\n --------------------------------  ")
+    print(df["INCOME_PER_FAMILY_MEMBER"].describe())
+
+    print(f"\nMissing values: \n {df["INCOME_PER_FAMILY_MEMBER"].isna().sum()}")
+    print( df[["AMT_INCOME_TOTAL", "CNT_FAM_MEMBERS","INCOME_PER_FAMILY_MEMBER"]].head(10))
 
 if __name__ == "__main__":
     main()
