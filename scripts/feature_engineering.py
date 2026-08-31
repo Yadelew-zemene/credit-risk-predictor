@@ -62,6 +62,13 @@ def create_annuity_income_ratio(df: pd.DataFrame) -> pd.DataFrame:
     df["ANNUITY_INCOME_RATIO"] = (df["AMT_ANNUITY"] / df["AMT_INCOME_TOTAL"])
 
     return df
+def create_credit_annuity_ratio(df: pd.DataFrame) -> pd.DataFrame:
+    """Create the ratio between credit amount and loan annuity."""
+
+    df = df.copy()
+    df["CREDIT_ANNUITY_RATIO"] = ( df["AMT_CREDIT"] / df["AMT_ANNUITY"])
+
+    return df
 
 # Main
 
@@ -74,6 +81,8 @@ def main() -> None:
     df = create_employment_feature(df)
     df = create_credit_income_ratio(df)
     df = create_annuity_income_ratio(df)
+    df =  create_credit_annuity_ratio(df)
+
 
     print("\nFE-01: AGE_YEARS \n ----------------")
     print(df["AGE_YEARS"].describe())
@@ -92,6 +101,10 @@ def main() -> None:
     print("\nFE-04: ANNUITY_INCOME_RATIO \n ---------------------------")
     print(df["ANNUITY_INCOME_RATIO"].describe())
     print(df[["AMT_INCOME_TOTAL","AMT_ANNUITY","ANNUITY_INCOME_RATIO"]].head(10))
+
+    print("\nFE-05: CREDIT_ANNUITY_RATIO \n ---------------------------")
+    print(df["CREDIT_ANNUITY_RATIO"].describe())
+    print(df[["AMT_CREDIT", "AMT_ANNUITY","CREDIT_ANNUITY_RATIO"]].head(10))
 
 if __name__ == "__main__":
     main()
