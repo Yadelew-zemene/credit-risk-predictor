@@ -22,31 +22,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
-from  data_split import  split_data
-
 
 
 # Configuration
-PROJECT_ROOT =Path (__file__).resolve().parents[1]
-TRAIN_PATH = ( PROJECT_ROOT / "data" / "raw" / "home-credit-default-risk" / "application_train.csv")
+
 
 TARGET_COLUMN ,ID_COLUMNS= "TARGET" , ["SK_ID_CURR"]
 
-
-# ---------------------------------------------------------------------
-# Load data
-# ---------------------------------------------------------------------
-def load_data(path:Path)->pd.DataFrame:
-    """Load the training dataset."""
-    df = pd.read_csv(path)
-    print("Dataset shape: ",df.shape)
-    return  df
-
-# Separate features and target
-def split_features_target(df:pd.DataFrame)->tuple[pd.DataFrame, pd.Series]:
-
-    X , y = df.drop(columns=[TARGET_COLUMN]),  df[TARGET_COLUMN]
-    return X ,y
 
 # Remove identifier columns
 def remove_identifier_columns(X:pd.DataFrame)->pd.DataFrame:
@@ -100,35 +82,21 @@ def preprocess_train_validation(X_train: pd.DataFrame,X_valid: pd.DataFrame, pre
 
 # Main
 def main() -> None:
-    df = load_data(TRAIN_PATH)
+    """
+        Demonstrate the preprocessing module.
 
-    # Split into train/validation first
-    X_train, X_valid, y_train, y_valid = split_data(df)
+        The actual project workflow will later be orchestrated by train.py.
+        """
 
-    # Remove identifier from both feature sets
-    X_train = remove_identifier_columns(X_train)
-    X_valid = remove_identifier_columns(X_valid)
-    numerical_features, categorical_features = identify_feature_types(X_train)
+    print("Preprocessing module loaded successfully.")
 
-    print("\nFeature information \n -------------------")
+    print("\nResponsibilities:")
+    print("1. Remove identifier columns")
+    print("2. Identify feature types")
+    print("3. Build preprocessing pipeline")
+    print("4. Fit preprocessing on training data only")
+    print("5. Transform training and validation data")
 
-    print( f"Numerical features: {len(numerical_features)} \nCategorical features: {len(categorical_features)}")
-
-    print( f"Total features before encoding: {X_train.shape[1]}")
-
-    preprocessor = build_preprocessor(numerical_features,categorical_features, )
-
-
-    X_train_processed, X_valid_processed = (preprocess_train_validation(X_train,X_valid,preprocessor,))
-
-    print("\nPreprocessing complete")
-    print(f"Original training shape: {X_train.shape}")
-    print(f"Processed training shape: " f"{X_train_processed.shape}")
-
-    print(f"Original validation shape: {X_valid.shape}" )
-    print(f"Processed validation shape: "f"{X_valid_processed.shape}"
-          )
-    print(f"\nTarget distribution : \n   {y_train.value_counts(normalize=True).round(4)}")
 
 
 if __name__ == "__main__":
