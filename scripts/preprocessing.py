@@ -66,6 +66,7 @@ def build_preprocessor(numerical_features:list[str],categotical_features:list[st
                              transformers= [("numerical", numerical_pipeline,numerical_features),
                                             ("catigorical" , categorical_pipeline ,categotical_features)])
                              )
+
     return preprocessor
 
 def preprocess_train_validation(X_train: pd.DataFrame,X_valid: pd.DataFrame, preprocessor: ColumnTransformer,):
