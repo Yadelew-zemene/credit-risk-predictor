@@ -1,10 +1,12 @@
 from pathlib import Path
-
+import  pytest
 import pandas as pd
 from fastapi.testclient import TestClient
 
 from api.main import app
-
+@pytest.fixture
+def client():
+    return TestClient(app)
 
 client = TestClient(app)
 
@@ -98,3 +100,36 @@ def test_predict_endpoint_handles_internal_error(monkeypatch):
     )
 
     assert "simulated internal failure" not in str(result)
+
+def test_predict_rejects_invalid_field_type():
+    client = TestClient(app)
+
+    payload = {
+        "SK_ID_CURR": "not-a-number",
+    }
+
+
+    response = client.post("/predict", json=payload)
+
+    assert response.status_code == 422
+def test_predict_handles_extra_field():
+    client = TestClient(app)
+
+    df = pd.read_csv(DATA_PATH)
+
+    applicant = (
+        df.drop(columns=["TARGET"]).iloc[0]
+        .where(lambda x: x.notna(), None)
+        .to_dict()
+    )
+
+    applicant["UNEXPECTED_FIELD"] = "test-value"
+
+    response = client.post("/predict", json=applicant)
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert "default_probability" in result
+    assert "prediction" in result
