@@ -43,5 +43,26 @@ def test_predict_endpoint_with_real_applicant():
     assert result["threshold"] == 0.65
     assert result["prediction"] in [0, 1]
 
-    print("\nAPI prediction:")
-    print(result)
+    print(f"\nAPI prediction:\n {result}")
+
+
+def test_predict_endpoint_rejects_empty_applicant():
+    response = client.post(
+        "/predict", json={},)
+
+    assert response.status_code == 422
+
+    result = response.json()
+    assert result["detail"] == "Applicant data cannot be empty."
+
+
+def test_predict_endpoint_rejects_missing_required_fields():
+    response = client.post(
+        "/predict",
+        json={ "SK_ID_CURR": 100002,},)
+
+    assert response.status_code == 422
+    result = response.json()
+
+    assert result["detail"]["message"] == "Missing required applicant fields."
+    assert len(result["detail"]["missing_fields"]) > 0

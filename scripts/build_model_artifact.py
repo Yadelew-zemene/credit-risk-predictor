@@ -12,7 +12,7 @@ import joblib
 from data_understanding import load_data
 from data_split import DATA_PATH, split_data
 
-from model_pipeline import (
+from scripts.model_pipeline import (
     FeatureEngineeringTransformer,
     IdentifierRemovalTransformer,
     PreprocessingTransformer,

@@ -18,15 +18,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 
-class FeatureEngineeringTransformer(
-    BaseEstimator,
-    TransformerMixin,
-):
+class FeatureEngineeringTransformer( BaseEstimator,TransformerMixin,):
     """
     Apply deterministic project feature engineering.
     """
 
     def fit(self, X, y=None):
+        self.feature_names_in_ = X.columns.tolist()
         return self
 
     def transform(self, X):
