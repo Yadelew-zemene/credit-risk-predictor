@@ -2,9 +2,9 @@ from typing import Any
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException
-from pydantic import RootModel
 from functools import lru_cache
 
+from pydantic import BaseModel, RootModel
 from scripts.inference import load_model_artifact, predict_applicant
 
 
@@ -23,11 +23,15 @@ class ApplicantRequest(RootModel[dict[str, Any]]):
     """
 
 
-class PredictionResponse(RootModel[dict[str, Any]]):
+class PredictionResponse(BaseModel):
     """
     Prediction returned by the production inference pipeline.
     """
 
+    default_probability: float
+    threshold: float
+    prediction: int
+    decision: str
 
 @app.get("/health")
 def health_check():
