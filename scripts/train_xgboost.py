@@ -26,11 +26,10 @@ from feature_engineering import create_features
 from data_split import split_data ,DATA_PATH
 from data_understanding import load_data
 from preprocessing import (
-
     remove_identifier_columns,
     identify_feature_types,
     build_preprocessor,
-    preprocess_train_validation,
+    preprocess_train_validation_test,
 )
 
 
@@ -59,11 +58,13 @@ def prepare_data(df):
     # Build preprocessing pipeline
     preprocessor = build_preprocessor( numerical_features, categorical_features,)
 
-    # Fit preprocessing ONLY on training data
-    X_train_processed, X_valid_processed = preprocess_train_validation(X_train, X_valid, preprocessor,)
-
-    # Transform test using the already-fitted preprocessor
-    X_test_processed = preprocessor.transform(X_test)
+    ( X_train_processed, X_valid_processed,X_test_processed,) = (
+        preprocess_train_validation_test(
+        X_train,
+        X_valid,
+        X_test,
+        preprocessor,
+    ))
 
     return (
         X_train_processed,

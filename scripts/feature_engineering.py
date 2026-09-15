@@ -28,7 +28,7 @@ def create_employment_feature(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.copy()
 
-    employment_days = df["DAYS_EMPLOYED"].replace(365243, pd.NA)
+    employment_days = df["DAYS_EMPLOYED"].replace(365243, float("nan"))
     df["EMPLOYMENT_YEARS"] = -employment_days / 365.25
 
     return df
