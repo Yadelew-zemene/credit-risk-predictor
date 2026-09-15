@@ -8,11 +8,17 @@ from scripts.inference import load_model_artifact
 
 def applicant_to_model_input(
     applicant: ApplicantRequest,
+    artifact=None,
 ) -> pd.DataFrame:
     """
     Convert the frontend-friendly applicant contract into
     the exact raw feature schema expected by the ML pipeline.
     """
+
+    if artifact is None:
+        artifact = load_model_artifact()
+
+    expected_columns = artifact["feature_transformer"].feature_names_in_
 
     data = {
         "SK_ID_CURR": 999999,
@@ -50,12 +56,6 @@ def applicant_to_model_input(
         "EXT_SOURCE_2": applicant.external_source_2,
         "EXT_SOURCE_3": applicant.external_source_3,
     }
-
-    artifact = load_model_artifact()
-
-    expected_columns = artifact[
-        "feature_transformer"
-    ].feature_names_in_
 
     result = pd.DataFrame([data])
 
