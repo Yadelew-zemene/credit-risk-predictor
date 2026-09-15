@@ -3,6 +3,7 @@ from typing import Any
 import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import RootModel
+from functools import lru_cache
 
 from scripts.inference import load_model_artifact, predict_applicant
 
@@ -12,7 +13,9 @@ app = FastAPI(
     description="API for predicting loan default risk.",
     version="1.0.0",
 )
-
+@lru_cache(maxsize=1)
+def get_model_artifact():
+    return load_model_artifact()
 
 class ApplicantRequest(RootModel[dict[str, Any]]):
     """
@@ -45,7 +48,7 @@ def predict(request: ApplicantRequest):
                 detail="Applicant data cannot be empty.",
             )
 
-        artifact = load_model_artifact()
+        artifact = get_model_artifact()
 
         required_columns = set(
             artifact["feature_transformer"].feature_names_in_
