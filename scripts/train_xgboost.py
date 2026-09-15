@@ -22,8 +22,8 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix,
 )
-
-from data_split import split_data
+from feature_engineering import create_features
+from data_split import split_data ,DATA_PATH
 from data_understanding import load_data
 from preprocessing import (
 
@@ -33,37 +33,36 @@ from preprocessing import (
     preprocess_train_validation,
 )
 
-from scripts.feature_engineering import DATA_PATH
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 def prepare_data(df):
-    """Prepare train, validation, and test data using the existing pipeline."""
+    """Prepare train, validation, and test data."""
 
-    (
-        X_train,
-        X_valid,
-        X_test,
-        y_train,
-        y_valid,
-        y_test,
-    ) = split_data(df)
+    # Split raw data before preprocessing
+    X_train, X_valid, X_test, y_train, y_valid, y_test = split_data(df)
 
-    # Remove identifiers from all feature sets
+    # Apply deterministic feature engineering consistently
+    X_train = create_features(X_train)
+    X_valid = create_features(X_valid)
+    X_test = create_features(X_test)
+
+    # Remove identifiers
     X_train = remove_identifier_columns(X_train)
     X_valid = remove_identifier_columns(X_valid)
     X_test = remove_identifier_columns(X_test)
 
-    # Determine feature types using training data only
-    numerical_features, categorical_features = identify_feature_types( X_train)
+    # Identify feature types using training data only
+    numerical_features, categorical_features = identify_feature_types(X_train)
 
-    # Build preprocessor
-    preprocessor = build_preprocessor(numerical_features,categorical_features,)
+    # Build preprocessing pipeline
+    preprocessor = build_preprocessor( numerical_features, categorical_features,)
 
-    # The preprocessor must be fitted using X_train only.
-    X_train_processed, X_valid_processed = preprocess_train_validation(X_train,X_valid,preprocessor,)
+    # Fit preprocessing ONLY on training data
+    X_train_processed, X_valid_processed = preprocess_train_validation(X_train, X_valid, preprocessor,)
 
-    # Transform test using the already-fitted preprocessor.
+    # Transform test using the already-fitted preprocessor
     X_test_processed = preprocessor.transform(X_test)
 
     return (
@@ -177,6 +176,7 @@ def main() -> None:
         y_test,
         preprocessor,
     ) = prepare_data(df)
+
 
     feature_names = preprocessor.get_feature_names_out()
     model = build_xgboost_model()
