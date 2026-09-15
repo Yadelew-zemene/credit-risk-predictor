@@ -66,3 +66,35 @@ def test_predict_endpoint_rejects_missing_required_fields():
 
     assert result["detail"]["message"] == "Missing required applicant fields."
     assert len(result["detail"]["missing_fields"]) > 0
+def test_predict_endpoint_handles_internal_error(monkeypatch):
+    df = pd.read_csv(DATA_PATH)
+
+    applicant = (
+        df.drop(columns=["TARGET"])
+        .iloc[0]
+        .where(lambda x: x.notna(), None)
+        .to_dict()
+    )
+
+    def failing_prediction(*args, **kwargs):
+        raise RuntimeError("simulated internal failure")
+
+    monkeypatch.setattr(
+        "api.main.predict_applicant",
+        failing_prediction,
+    )
+
+    response = client.post(
+        "/predict",
+        json=applicant,
+    )
+
+    assert response.status_code == 500
+
+    result = response.json()
+
+    assert result["detail"] == (
+        "Prediction service encountered an internal error."
+    )
+
+    assert "simulated internal failure" not in str(result)

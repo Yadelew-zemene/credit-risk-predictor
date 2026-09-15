@@ -74,8 +74,9 @@ def predict(request: ApplicantRequest):
     except HTTPException:
         raise
 
-    except Exception as exc:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Prediction failed: {str(exc)}",
-        ) from exc
+    except Exception:
+
+     raise HTTPException(
+
+       status_code=500,
+       detail="Prediction service encountered an internal error.",)
