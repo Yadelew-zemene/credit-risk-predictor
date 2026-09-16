@@ -14,12 +14,14 @@ interface AssessmentShellProps {
   currentStep: number;
   steps: AssessmentStep[];
   children: React.ReactNode;
+  showProgress?: boolean;
 }
 
 export function AssessmentShell({
   currentStep,
   steps,
   children,
+  showProgress = true,
 }: AssessmentShellProps) {
   const currentStepData = steps.find((step) => step.id === currentStep);
 
