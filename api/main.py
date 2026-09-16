@@ -1,7 +1,7 @@
 
 
-import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from functools import lru_cache
 
 from api.adapter import applicant_to_model_input
@@ -15,6 +15,16 @@ app = FastAPI(
     title="Loan Default Prediction API",
     description="API for predicting loan default risk.",
     version="1.0.0",
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 @lru_cache(maxsize=1)
 def get_model_artifact():

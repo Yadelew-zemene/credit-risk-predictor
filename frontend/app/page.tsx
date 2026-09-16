@@ -1,6 +1,10 @@
-import { Navbar } from "@/components/navbar";
+import { CtaSection } from "@/components/cta-section";
+import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
+import { HowItWorks } from "@/components/how-it-works";
 import { ModelStats } from "@/components/model-stats";
+import { Navbar } from "@/components/navbar";
+import { ResponsibleAI } from "@/components/responsible-ai";
 
 export default function Home() {
   return (
@@ -11,28 +15,13 @@ export default function Home() {
 
       <ModelStats />
 
-      {/* Remaining landing-page sections will be added next. */}
-      <section
-        id="how-it-works"
-        className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8"
-      >
-        <div className="rounded-3xl border border-dashed border-border bg-surface-muted/50 p-10 text-center">
-          <p className="text-sm font-medium text-muted">
-            How it works section — next milestone
-          </p>
-        </div>
-      </section>
+      <HowItWorks />
 
-      <section
-        id="responsible-ai"
-        className="mx-auto max-w-7xl px-5 pb-20 sm:px-6 lg:px-8"
-      >
-        <div className="rounded-3xl border border-dashed border-border bg-surface-muted/50 p-10 text-center">
-          <p className="text-sm font-medium text-muted">
-            Responsible AI section — next milestone
-          </p>
-        </div>
-      </section>
+      <ResponsibleAI />
+
+      <CtaSection />
+
+      <Footer />
     </main>
   );
 }
