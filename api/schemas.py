@@ -95,3 +95,43 @@ class AssessmentHistoryItem(BaseModel):
     decision_threshold: float
     prediction: int
     decision: str
+
+class AssessmentDetail(BaseModel):
+    id: UUID
+    created_at: datetime
+    model_version: str
+
+    contract_type: str
+    gender: str
+    owns_car: str
+    owns_realty: str
+    children_count: int
+    family_members: int
+    family_status: str
+    education_type: str
+    income_type: str
+    occupation_type: str | None
+    housing_type: str
+
+    annual_income: float
+    credit_amount: float
+    annuity_amount: float
+    goods_price: float | None
+
+    age_years: float
+    employment_years: float
+    registration_years: float
+    id_published_years: float
+    car_age: float | None
+
+    region_population_relative: float | None
+    region_rating: int | None
+    region_rating_city: int | None
+    external_source_1: float | None
+    external_source_2: float | None
+    external_source_3: float | None
+
+    default_probability: float
+    decision_threshold: float
+    prediction: int
+    decision: str

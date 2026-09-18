@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from uuid import UUID
 from api.db.models import Assessment
 from api.schemas import ApplicantRequest
 from sqlalchemy import select
@@ -58,3 +58,12 @@ def get_assessments(
     )
 
     return list(db.scalars(statement).all())
+def get_assessment(
+    db: Session,
+    assessment_id: UUID,
+) -> Assessment | None:
+    statement = select(Assessment).where(
+        Assessment.id == assessment_id
+    )
+
+    return db.scalar(statement)
