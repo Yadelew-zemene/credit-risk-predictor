@@ -1,17 +1,27 @@
-from pathlib import Path
-import  pytest
-import pandas as pd
+import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import delete
 
+from api.db.database import get_db
+from api.db.models import Assessment
 from api.main import app
-@pytest.fixture
-def client():
-    return TestClient(app)
+
 
 client = TestClient(app)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DATA_PATH = PROJECT_ROOT / "data" / "raw" / "home-credit-default-risk" / "application_train.csv"
+
+@pytest.fixture(autouse=True)
+def clean_assessments():
+    yield
+
+    db = next(get_db())
+
+    try:
+        db.execute(delete(Assessment))
+        db.commit()
+    finally:
+        db.close()
+
 
 def valid_applicant_payload():
     return {
@@ -42,9 +52,9 @@ def valid_applicant_payload():
         "external_source_2": 0.6,
         "external_source_3": 0.7,
     }
-def test_predict_endpoint_with_valid_applicant():
-    client = TestClient(app)
 
+
+def test_predict_endpoint_with_valid_applicant():
     response = client.post(
         "/predict",
         json=valid_applicant_payload(),
@@ -97,6 +107,8 @@ def test_predict_endpoint_rejects_missing_required_fields():
     ]
 
     assert "annual_income" in missing_fields
+
+
 def test_predict_endpoint_handles_internal_error(monkeypatch):
     def failing_prediction(*args, **kwargs):
         raise RuntimeError("simulated internal failure")
@@ -119,17 +131,20 @@ def test_predict_endpoint_handles_internal_error(monkeypatch):
         "Prediction service encountered an internal error."
     )
 
-def test_predict_rejects_invalid_field_type():
-    client = TestClient(app)
 
+def test_predict_rejects_invalid_field_type():
     payload = {
         "SK_ID_CURR": "not-a-number",
     }
 
-
-    response = client.post("/predict", json=payload)
+    response = client.post(
+        "/predict",
+        json=payload,
+    )
 
     assert response.status_code == 422
+
+
 def test_predict_handles_extra_field():
     payload = valid_applicant_payload()
 
