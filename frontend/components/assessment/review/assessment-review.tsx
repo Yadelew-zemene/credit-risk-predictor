@@ -2,13 +2,16 @@
 
 import {
   BriefcaseBusiness,
+  Check,
   ChevronRight,
   CircleDollarSign,
   FileCheck2,
   Home,
+  Loader2,
   Pencil,
   ShieldCheck,
   UserRound,
+  X,
 } from "lucide-react";
 
 import type { ApplicantRequest } from "@/lib/types";
@@ -37,19 +40,17 @@ function ReviewSection({
   children,
 }: ReviewSectionProps) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-      <div className="flex items-start justify-between gap-4 border-b border-border bg-surface-muted/40 px-5 py-5 sm:px-6">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
-            <Icon size={19} />
+    <section className="group overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs transition-all duration-200 hover:border-slate-300">
+      <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-5 py-4 sm:px-6">
+        <div className="flex items-center gap-3.5">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 transition-colors group-hover:bg-blue-100/70">
+            <Icon size={19} className="stroke-[2.25]" />
           </div>
-
           <div>
-            <h3 className="text-base font-semibold text-primary-dark sm:text-lg">
+            <h3 className="text-base font-semibold tracking-tight text-slate-900">
               {title}
             </h3>
-
-            <p className="mt-1 text-sm leading-5 text-muted">
+            <p className="text-xs text-slate-500">
               {description}
             </p>
           </div>
@@ -58,15 +59,17 @@ function ReviewSection({
         <button
           type="button"
           onClick={onEdit}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-2 text-xs font-semibold text-primary-dark transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-xs transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
         >
-          <Pencil size={14} />
+          <Pencil size={13} className="text-slate-500" />
           <span>Edit</span>
         </button>
       </div>
 
-      <div className="divide-y divide-border px-5 sm:px-6">
-        {children}
+      <div className="p-5 sm:p-6">
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+          {children}
+        </dl>
       </div>
     </section>
   );
@@ -74,21 +77,28 @@ function ReviewSection({
 
 interface ReviewFieldProps {
   label: string;
-  value: string;
+  value: React.ReactNode;
+  highlight?: boolean;
 }
 
-function ReviewField({ label, value }: ReviewFieldProps) {
+function ReviewField({ label, value, highlight = false }: ReviewFieldProps) {
   return (
-    <div className="grid gap-1 py-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)] sm:gap-6">
-      <dt className="text-xs font-medium text-muted sm:text-sm">{label}</dt>
-
-      <dd className="break-words text-sm font-semibold text-primary-dark">
+    <div className="flex flex-col gap-1 rounded-xl bg-slate-50/60 px-3.5 py-2.5 transition-colors hover:bg-slate-50">
+      <dt className="text-xs font-medium text-slate-500">{label}</dt>
+      <dd
+        className={`break-words text-sm ${
+          highlight
+            ? "font-bold text-slate-900"
+            : "font-semibold text-slate-800"
+        }`}
+      >
         {value}
       </dd>
     </div>
   );
 }
 
+// Utility Formatter Helpers
 function formatNumber(value: number, maximumFractionDigits = 2) {
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits,
@@ -104,23 +114,32 @@ function formatCurrency(value: number) {
 }
 
 function formatYears(value: number) {
-  if (value === 1) {
-    return "1 year";
-  }
-
+  if (value === 1) return "1 year";
   return `${formatNumber(value)} years`;
 }
 
 function formatNullableNumber(value: number | null) {
-  return value === null ? "Not provided" : formatNumber(value);
+  return value === null ? (
+    <span className="font-normal italic text-slate-400">Not provided</span>
+  ) : (
+    formatNumber(value)
+  );
 }
 
-function formatYesNo(value: "Y" | "N") {
-  return value === "Y" ? "Yes" : "No";
-}
-
-function formatGender(value: "M" | "F") {
-  return value === "M" ? "Male" : "Female";
+function formatYesNoBadge(value: "Y" | "N") {
+  const isYes = value === "Y";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium ${
+        isYes
+          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20"
+          : "bg-slate-100 text-slate-600 ring-1 ring-slate-500/10"
+      }`}
+    >
+      {isYes ? <Check size={12} /> : <X size={12} />}
+      {isYes ? "Yes" : "No"}
+    </span>
+  );
 }
 
 function formatContractType(value: ApplicantRequest["contract_type"]) {
@@ -128,7 +147,14 @@ function formatContractType(value: ApplicantRequest["contract_type"]) {
 }
 
 function formatExternalScore(value: number | null) {
-  return value === null ? "Not provided" : value.toFixed(3);
+  if (value === null) {
+    return <span className="font-normal italic text-slate-400">Not provided</span>;
+  }
+  return (
+    <span className="font-mono text-xs font-bold tracking-tight text-slate-900">
+      {value.toFixed(3)}
+    </span>
+  );
 }
 
 export function AssessmentReview({
@@ -139,49 +165,49 @@ export function AssessmentReview({
   isSubmitting = false,
 }: AssessmentReviewProps) {
   return (
-    <div className="space-y-6">
-      {/* Review introduction */}
-      <div className="rounded-2xl border border-primary/15 bg-primary/5 px-5 py-5 sm:px-6">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <FileCheck2 size={18} />
+    <div className="mx-auto max-w-4xl space-y-6">
+      {/* Top Banner Notice */}
+      <div className="relative overflow-hidden rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50/80 via-indigo-50/30 to-blue-50/50 p-5 sm:p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-xs">
+            <FileCheck2 size={20} />
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-primary-dark sm:text-base">
-              Review before assessment
+          <div className="space-y-1">
+            <h3 className="text-base font-semibold text-slate-900">
+              Review Applicant Information
             </h3>
-
-            <p className="mt-1 text-sm leading-6 text-muted">
-              Please verify the applicant information below before running the
-              credit-risk model. You can edit any section before continuing.
+            <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
+              Please verify all entries below before triggering the risk assessment engine.
+              Clicking <span className="font-medium text-slate-900">Edit</span> on any section will allow you to modify parameters.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Applicant information */}
-      <ReviewSection
-        title="Applicant information"
-        description="Personal, household, and demographic information"
-        icon={UserRound}
-        onEdit={() => onEditStep(1)}
-      >
-        <dl>
+      {/* Grid of Sections */}
+      <div className="space-y-6">
+        {/* Section 1: Applicant Information */}
+        <ReviewSection
+          title="Applicant Details"
+          description="Personal, household, and demographic details"
+          icon={UserRound}
+          onEdit={() => onEditStep(1)}
+        >
           <ReviewField
             label="Contract type"
             value={formatContractType(values.contract_type)}
           />
           <ReviewField
             label="Gender"
-            value={formatGender(values.gender)}
+            value={values.gender === "M" ? "Male" : "Female"}
           />
           <ReviewField
             label="Age"
             value={formatYears(values.age_years)}
           />
           <ReviewField
-            label="Children"
+            label="Children count"
             value={formatNumber(values.children_count, 0)}
           />
           <ReviewField
@@ -193,7 +219,7 @@ export function AssessmentReview({
             value={values.family_status}
           />
           <ReviewField
-            label="Education"
+            label="Education type"
             value={values.education_type}
           />
           <ReviewField
@@ -202,7 +228,13 @@ export function AssessmentReview({
           />
           <ReviewField
             label="Occupation"
-            value={values.occupation_type ?? "Not provided"}
+            value={
+              values.occupation_type ?? (
+                <span className="font-normal italic text-slate-400">
+                  Not provided
+                </span>
+              )
+            }
           />
           <ReviewField
             label="Housing type"
@@ -210,30 +242,30 @@ export function AssessmentReview({
           />
           <ReviewField
             label="Owns a car"
-            value={formatYesNo(values.owns_car)}
+            value={formatYesNoBadge(values.owns_car)}
           />
           <ReviewField
             label="Owns realty"
-            value={formatYesNo(values.owns_realty)}
+            value={formatYesNoBadge(values.owns_realty)}
           />
-        </dl>
-      </ReviewSection>
+        </ReviewSection>
 
-      {/* Financial information */}
-      <ReviewSection
-        title="Financial information"
-        description="Income, credit, and loan details"
-        icon={CircleDollarSign}
-        onEdit={() => onEditStep(2)}
-      >
-        <dl>
+        {/* Section 2: Financial Information */}
+        <ReviewSection
+          title="Financial Profile"
+          description="Income, credit lines, and requested amounts"
+          icon={CircleDollarSign}
+          onEdit={() => onEditStep(2)}
+        >
           <ReviewField
             label="Annual income"
             value={formatCurrency(values.annual_income)}
+            highlight
           />
           <ReviewField
             label="Credit amount"
             value={formatCurrency(values.credit_amount)}
+            highlight
           />
           <ReviewField
             label="Annuity amount"
@@ -243,21 +275,19 @@ export function AssessmentReview({
             label="Goods price"
             value={
               values.goods_price === null
-                ? "Not provided"
+                ? <span className="font-normal italic text-slate-400">Not provided</span>
                 : formatCurrency(values.goods_price)
             }
           />
-        </dl>
-      </ReviewSection>
+        </ReviewSection>
 
-      {/* Employment and history */}
-      <ReviewSection
-        title="Employment & history"
-        description="Employment and applicant history"
-        icon={BriefcaseBusiness}
-        onEdit={() => onEditStep(3)}
-      >
-        <dl>
+        {/* Section 3: Employment and History */}
+        <ReviewSection
+          title="Employment & History"
+          description="Work experience and official record duration"
+          icon={BriefcaseBusiness}
+          onEdit={() => onEditStep(3)}
+        >
           <ReviewField
             label="Employment duration"
             value={formatYears(values.employment_years)}
@@ -274,26 +304,22 @@ export function AssessmentReview({
             label="Car age"
             value={
               values.car_age === null
-                ? "Not provided"
+                ? <span className="font-normal italic text-slate-400">Not provided</span>
                 : formatYears(values.car_age)
             }
           />
-        </dl>
-      </ReviewSection>
+        </ReviewSection>
 
-      {/* Additional signals */}
-      <ReviewSection
-        title="Additional signals"
-        description="Regional and external model inputs"
-        icon={Home}
-        onEdit={() => onEditStep(4)}
-      >
-        <dl>
+        {/* Section 4: Additional Signals */}
+        <ReviewSection
+          title="External Signals & Ratings"
+          description="Regional data inputs and third-party scoring"
+          icon={Home}
+          onEdit={() => onEditStep(4)}
+        >
           <ReviewField
             label="Region population relative"
-            value={formatNullableNumber(
-              values.region_population_relative,
-            )}
+            value={formatNullableNumber(values.region_population_relative)}
           />
           <ReviewField
             label="Region rating"
@@ -315,37 +341,34 @@ export function AssessmentReview({
             label="External source 3"
             value={formatExternalScore(values.external_source_3)}
           />
-        </dl>
-      </ReviewSection>
+        </ReviewSection>
+      </div>
 
-      {/* Confirmation notice */}
-      <div className="rounded-2xl border border-border bg-surface px-5 py-5 sm:px-6">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-primary">
+      {/* Confirmation Card */}
+      <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-5 sm:p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100/80 text-emerald-700">
             <ShieldCheck size={18} />
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-primary-dark">
-              Ready to run the assessment?
-            </p>
-
-            <p className="mt-1 text-xs leading-5 text-muted sm:text-sm">
-              CrediSense will send the reviewed information to the prediction
-              service and return an estimated default probability and model
-              classification.
+            <h4 className="text-sm font-semibold text-slate-900">
+              Ready to submit assessment?
+            </h4>
+            <p className="text-xs text-slate-500">
+              CrediSense will calculate default probabilities and render an evaluation decision instantly.
             </p>
           </div>
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+      {/* Action Footer */}
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border bg-surface px-5 py-3 text-sm font-semibold text-primary-dark transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-xs transition-all hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           Back to information
         </button>
@@ -354,11 +377,20 @@ export function AssessmentReview({
           type="button"
           onClick={onConfirm}
           disabled={isSubmitting}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-xs transition-all hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <ShieldCheck size={17} />
-          Run assessment
-          <ChevronRight size={16} />
+          {isSubmitting ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Evaluating model...
+            </>
+          ) : (
+            <>
+              <ShieldCheck size={17} />
+              Run assessment
+              <ChevronRight size={16} />
+            </>
+          )}
         </button>
       </div>
     </div>
