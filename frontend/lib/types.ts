@@ -55,3 +55,43 @@ export interface AssessmentHistoryItem {
   prediction: number;
   decision: string;
 }
+export interface AssessmentDetail {
+  id: string;
+  created_at: string;
+  model_version: string;
+
+  contract_type: string;
+  gender: string;
+  owns_car: string;
+  owns_realty: string;
+  children_count: number;
+  family_members: number;
+  family_status: string;
+  education_type: string;
+  income_type: string;
+  occupation_type: string | null;
+  housing_type: string;
+
+  annual_income: number;
+  credit_amount: number;
+  annuity_amount: number;
+  goods_price: number | null;
+
+  age_years: number;
+  employment_years: number;
+  registration_years: number;
+  id_published_years: number;
+  car_age: number | null;
+
+  region_population_relative: number | null;
+  region_rating: number | null;
+  region_rating_city: number | null;
+  external_source_1: number | null;
+  external_source_2: number | null;
+  external_source_3: number | null;
+
+  default_probability: number;
+  decision_threshold: number;
+  prediction: number;
+  decision: string;
+}

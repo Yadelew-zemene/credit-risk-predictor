@@ -44,3 +44,20 @@ export async function getAssessments(): Promise<AssessmentHistoryItem[]> {
 
   return response.json();
 }
+export async function getAssessment(
+  assessmentId: string,
+): Promise<AssessmentDetail> {
+  const response = await fetch(
+    `${API_URL}/assessments/${assessmentId}`,
+  );
+
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error("Assessment not found.");
+    }
+
+    throw new Error("Unable to load assessment.");
+  }
+
+  return response.json();
+}
