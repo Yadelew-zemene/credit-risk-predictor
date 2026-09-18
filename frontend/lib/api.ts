@@ -35,3 +35,12 @@ export async function predictApplicant(
 
   return response.json();
 }
+export async function getAssessments(): Promise<AssessmentHistoryItem[]> {
+  const response = await fetch(`${API_URL}/assessments`);
+
+  if (!response.ok) {
+    throw new Error("Unable to load assessment history.");
+  }
+
+  return response.json();
+}

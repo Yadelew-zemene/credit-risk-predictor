@@ -46,3 +46,12 @@ export interface PredictionResponse {
   prediction: 0 | 1;
   decision: "DEFAULT RISK" | "NO DEFAULT RISK";
 }
+export interface AssessmentHistoryItem {
+  id: string;
+  created_at: string;
+  model_version: string;
+  default_probability: number;
+  decision_threshold: number;
+  prediction: number;
+  decision: string;
+}
