@@ -12,6 +12,8 @@ from api.schemas import ApplicantRequest
 from pydantic import BaseModel
 from scripts.inference import load_model_artifact, predict_applicant
 
+from api.db.repository import get_assessments
+from api.schemas import AssessmentHistoryItem
 
 app = FastAPI(
     title="Loan Default Prediction API",
@@ -90,3 +92,24 @@ def predict(
             status_code=500,
             detail="Prediction service encountered an internal error.",
         )
+@app.get(
+    "/assessments",
+    response_model=list[AssessmentHistoryItem],
+)
+def get_assessment_history(
+    db: Session = Depends(get_db),
+):
+    assessments = get_assessments(db)
+
+    return [
+        AssessmentHistoryItem(
+            id=assessment.id,
+            created_at=assessment.created_at,
+            model_version=assessment.model_version,
+            default_probability=float(assessment.default_probability),
+            decision_threshold=float(assessment.decision_threshold),
+            prediction=assessment.prediction,
+            decision=assessment.decision,
+        )
+        for assessment in assessments
+    ]

@@ -75,3 +75,38 @@ def test_predict_persists_assessment():
 
     finally:
         db.close()
+def test_get_assessment_history():
+    response = client.get("/assessments")
+
+    assert response.status_code == 200
+
+    result = response.json()
+
+    assert isinstance(result, list)
+
+    for assessment in result:
+        assert "id" in assessment
+        assert "created_at" in assessment
+        assert "model_version" in assessment
+        assert "default_probability" in assessment
+        assert "decision_threshold" in assessment
+        assert "prediction" in assessment
+        assert "decision" in assessment
+def test_get_assessment_history_returns_newest_first():
+    first_response = client.post("/predict", json=valid_applicant_payload())
+    assert first_response.status_code == 200
+
+    second_payload = valid_applicant_payload()
+    second_payload["annual_income"] = 240000
+
+    second_response = client.post("/predict", json=second_payload)
+    assert second_response.status_code == 200
+
+    response = client.get("/assessments")
+
+    assert response.status_code == 200
+
+    assessments = response.json()
+
+    assert len(assessments) >= 2
+    assert assessments[0]["created_at"] >= assessments[1]["created_at"]

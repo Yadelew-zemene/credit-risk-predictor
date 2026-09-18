@@ -1,5 +1,6 @@
 from typing import Literal
-
+from datetime import datetime
+from uuid import UUID
 from pydantic import BaseModel, Field
 
 
@@ -86,3 +87,11 @@ class ApplicantRequest(BaseModel):
         ge=0,
         le=1,
     )
+class AssessmentHistoryItem(BaseModel):
+    id: UUID
+    created_at: datetime
+    model_version: str
+    default_probability: float
+    decision_threshold: float
+    prediction: int
+    decision: str

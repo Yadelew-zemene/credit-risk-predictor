@@ -1,5 +1,5 @@
 from api.db.database import get_db
-from api.db.repository import save_assessment
+from api.db.repository import save_assessment,get_assessments
 from api.schemas import ApplicantRequest
 
 
@@ -53,5 +53,23 @@ def test_save_assessment():
 
         db.delete(assessment)
         db.commit()
+    finally:
+        db.close()
+def test_get_assessments():
+    db = next(get_db())
+
+    try:
+        assessments = get_assessments(db, limit=20)
+
+        assert isinstance(assessments, list)
+        assert len(assessments) <= 20
+
+        for assessment in assessments:
+            assert assessment.id is not None
+            assert assessment.created_at is not None
+            assert assessment.decision in (
+                "DEFAULT RISK",
+                "NO DEFAULT RISK",
+            )
     finally:
         db.close()

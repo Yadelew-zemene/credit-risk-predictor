@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from api.db.models import Assessment
 from api.schemas import ApplicantRequest
-
+from sqlalchemy import select
 
 def save_assessment(
     db: Session,
@@ -47,3 +47,14 @@ def save_assessment(
     db.refresh(assessment)
 
     return assessment
+def get_assessments(
+    db: Session,
+    limit: int = 20,
+) -> list[Assessment]:
+    statement = (
+        select(Assessment)
+        .order_by(Assessment.created_at.desc())
+        .limit(limit)
+    )
+
+    return list(db.scalars(statement).all())
