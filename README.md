@@ -87,9 +87,3 @@ Accuracy alone will not determine model quality.
 
 ## 9. Product Scope
 
-This is a portfolio and learning prototype.
-It is not intended to make real-world lending decisions without appropriate local data, validation, fairness assessment, security controls, and regulatory review.
-
-## 10. Future Ethiopian Adaptation
-
-The system will be designed so that it can later be adapted and evaluated using relevant Ethiopian financial data.
